@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>
+      {{ locationName || 'Úly' }}
+    </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- FORM -->
+  <ion-item>
+    <ion-input placeholder="Název úlu" [(ngModel)]="newBeehive.nazev"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input placeholder="Číslo úlu" [(ngModel)]="newBeehive.cislo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input placeholder="Počet nástavků" [(ngModel)]="newBeehive.pocet_nastavku"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="add()">
+    Přidat úl
+  </ion-button>
+
+  <!-- LIST -->
+  <ion-list>
+
+    @for (h of beehives; track h.id) {
+
+    <ion-item>
+
+      <ion-label (click)="open(h)">
+        <h2>Úl {{ h.cislo }}</h2>
+          <p>{{ h.nazev }}</p>
+        </ion-label>
+
+        <ion-button color="danger" (click)="delete(h.id)">
+          🗑
+        </ion-button>
+
+      </ion-item>
+
+    } @empty {
+
+    <ion-item>
+      <ion-label>Žádné úly</ion-label>
+    </ion-item>
+
+    }
+
+  </ion-list>
+
+</ion-content>

@@ -1,20 +1,94 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>🐝 Stanoviště</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <!-- LIST -->
+  <ion-list>
+
+    @for (loc of locations; track loc.id) {
+
+    <ion-item>
+
+      <!-- klik na detail -->
+      <ion-label (click)="open(loc)">
+        <h2>{{ loc.nazev }}</h2>
+          <p>{{ loc.lokace }}</p>
+        </ion-label>
+
+        <!-- DELETE -->
+        <ion-button color="danger" (click)="delete(loc.id)">
+          🗑
+        </ion-button>
+
+      </ion-item>
+
+    } @empty {
+
+    <ion-item>
+      <ion-label>Žádná stanoviště</ion-label>
+    </ion-item>
+
+    }
+
+  </ion-list>
+
+  <!-- FLOAT BUTTON -->
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openModal()">
+      +
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- MODAL -->
+  <ion-modal [isOpen]="isModalOpen">
+
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Přidat stanoviště</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-input
+            placeholder="Název"
+            [(ngModel)]="newLocation.nazev">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input
+            placeholder="Lokace"
+            [(ngModel)]="newLocation.lokace">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input
+            placeholder="Poznámky"
+            [(ngModel)]="newLocation.poznamky">
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" (click)="save()">
+          Uložit
+        </ion-button>
+
+        <ion-button expand="block" color="medium" (click)="closeModal()">
+          Zrušit
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+
+  </ion-modal>
+
 </ion-content>

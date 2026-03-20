@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/beehives"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>
+      {{ beehiveName || 'Záznamy' }}
+    </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- FORM -->
+  <ion-item>
+    <ion-input placeholder="Typ akce (krmení, léčba...)" [(ngModel)]="newRecord.typ_akce"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="date" [(ngModel)]="newRecord.datum"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="add()">
+    Přidat záznam
+  </ion-button>
+
+  <!-- LIST -->
+  <ion-list>
+
+    @for (r of records; track r.id) {
+
+    <ion-item>
+
+      <ion-label>
+        <h2>{{ r.typ_akce }}</h2>
+          <p>{{ r.datum }}</p>
+        </ion-label>
+
+        <ion-button color="danger" (click)="delete(r.id)">
+          🗑
+        </ion-button>
+
+      </ion-item>
+
+    } @empty {
+
+    <ion-item>
+      <ion-label>Žádné záznamy</ion-label>
+    </ion-item>
+
+    }
+
+  </ion-list>
+
+</ion-content>
