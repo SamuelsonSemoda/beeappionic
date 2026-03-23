@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -12,7 +12,7 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './home.page.html',
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
   locations: any[] = [];
 
@@ -29,14 +29,21 @@ export class HomePage {
     private router: Router
   ) {}
 
+  ngOnInit() {
+    this.load();
+    this.api.syncLocations();
+  }
+
   ionViewWillEnter() {
     this.load();
   }
 
-  load() {
-    this.api.getLocations().subscribe((data: any) => {
-      this.locations = data;
-    });
+  async load() {
+
+    const data = await this.api.getLocations();
+
+    this.locations = data || [];
+
   }
 
   open(loc: any) {
@@ -51,34 +58,53 @@ export class HomePage {
     this.isModalOpen = false;
   }
 
-  save() {
+  async save() {
 
     if (!this.newLocation.nazev) {
       alert('Zadej název');
       return;
     }
 
-    this.api.addLocation(this.newLocation).subscribe({
-      next: (res: any) => {
-        this.locations.push(res);
-        this.newLocation = { nazev: '', lokace: '', poznamky: '' };
-        this.closeModal();
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Chyba při ukládání');
-      }
-    });
+    try {
+
+      const res: any = await this.api.addLocation(this.newLocation);
+
+      this.locations.push(res);
+
+      this.newLocation = {
+        nazev: '',
+        lokace: '',
+        poznamky: ''
+      };
+
+      this.closeModal();
+
+    } catch (err:any) {
+
+      console.error(err);
+      alert('Chyba při ukládání');
+
+    }
 
   }
 
-  delete(id: number) {
+  async delete(id: number) {
 
     if (!confirm('Opravdu smazat?')) return;
 
-    this.api.deleteLocation(id).subscribe(() => {
+    try {
+
+      await this.api.deleteLocation(id);
+
       this.locations = this.locations.filter(l => l.id !== id);
-    });
+
+    } catch (err:any) {
+
+      console.error(err);
+      alert('Chyba při mazání');
+
+    }
+
   }
 
 }

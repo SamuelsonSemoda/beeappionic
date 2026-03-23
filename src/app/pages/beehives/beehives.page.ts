@@ -35,18 +35,15 @@ export class BeehivesPage {
     this.load();
   }
 
-  load() {
+  async load() {
 
-    // načti úly
-    this.api.getBeehives(this.locationId).subscribe((data: any) => {
-      this.beehives = data;
-    });
+    const data = await this.api.getLocations();
 
-    // načti název stanoviště
-    this.api.getLocations().subscribe((data: any) => {
-      const loc = data.find((l: any) => l.id == this.locationId);
-      this.locationName = loc?.nazev || 'Úly';
-    });
+    const loc = data.find((l:any)=> l.id == this.locationId);
+
+    this.locationName = loc?.nazev || '';
+
+    this.beehives = loc?.beehives || [];
 
   }
 

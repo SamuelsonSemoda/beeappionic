@@ -33,29 +33,26 @@ export class RecordsPage {
     this.load();
   }
 
-  load() {
+  async load() {
 
-    // načti záznamy
-    this.api.getRecords(this.beehiveId).subscribe((data: any) => {
-      this.records = data;
-    });
+    const data = await this.api.getLocations();
 
-    // načti název úlu (přes všechna stanoviště)
-    this.api.getLocations().subscribe((data: any) => {
+    let found:any = null;
 
-      let found: any = null;
+    data.forEach((loc:any)=>{
 
-      data.forEach((loc: any) => {
-        loc.beehives?.forEach((h: any) => {
-          if (h.id == this.beehiveId) {
-            found = h;
-          }
-        });
+      loc.beehives?.forEach((h:any)=>{
+
+        if(h.id == this.beehiveId){
+          found = h;
+        }
+
       });
 
-      this.beehiveName = found?.nazev || 'Záznamy';
-
     });
+
+    this.beehiveName = found?.nazev || 'Záznamy';
+    this.records = found?.records || [];
 
   }
 
