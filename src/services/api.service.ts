@@ -45,6 +45,8 @@ export class ApiService {
 
   }
 
+
+
   async addLocation(data: any) {
 
     if (navigator.onLine) {
@@ -99,12 +101,27 @@ export class ApiService {
     return this.http.get(`${this.api}/locations/${locationId}/beehives`);
   }
 
-  addBeehive(data:any){
-    return this.http.post(`${this.api}/beehives`, data);
+  async addBeehive(data:any){
+
+    const res = await fetch(this.api + '/beehives', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(data)
+    });
+
+    return res.json();
+
   }
 
-  deleteBeehive(id:number){
-    return this.http.delete(`${this.api}/beehives/${id}`);
+
+  async deleteBeehive(id:number){
+
+    await fetch(this.api + '/beehives/' + id,{
+      method:'DELETE'
+    });
+
   }
 
   /* RECORDS */

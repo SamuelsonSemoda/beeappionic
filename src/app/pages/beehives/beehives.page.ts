@@ -72,22 +72,24 @@ export class BeehivesPage implements OnInit {
     this.isModalOpen = false;
   }
 
-  async save() {
+  async save(){
 
-    if (!this.newBeehive.cislo) {
-      alert('Zadej číslo úlu');
-      return;
-    }
+    const res:any = await this.api.addBeehive(this.newBeehive);
 
-    const res = await this.api.addBeehive(this.newBeehive);
+    const hive = {
+      id: res.id,
+      cislo: res.cislo || this.newBeehive.cislo,
+      nazev: res.nazev || this.newBeehive.nazev,
+      poznamky: res.poznamky || this.newBeehive.poznamky
+    };
 
-    this.beehives.push(res);
+    this.beehives = [hive, ...this.beehives];
 
     this.newBeehive = {
-      nazev: '',
-      cislo: '',
-      poznamky: '',
-      location_id: this.locationId
+      cislo:'',
+      nazev:'',
+      poznamky:'',
+      location_id:this.locationId
     };
 
     this.closeModal();

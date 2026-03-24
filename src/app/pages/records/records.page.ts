@@ -78,14 +78,16 @@ export class RecordsPage implements OnInit {
 
   async save(){
 
-    const res: any = await this.api.addRecord(this.newRecord);
+    const res:any = await this.api.addRecord(this.newRecord);
 
-    this.records.unshift({
+    const record = {
       id: res.id,
-      typ_akce: res.typ_akce,
-      datum: res.datum,
-      popis: res.popis
-    });
+      typ_akce: res.typ_akce || this.newRecord.typ_akce,
+      datum: res.datum || this.newRecord.datum,
+      popis: res.popis || this.newRecord.popis
+    };
+
+    this.records = [record, ...this.records];
 
     this.newRecord = {
       typ_akce: 'kontrola',
