@@ -1,12 +1,12 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
 
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
 
     <ion-title>
-      {{ locationName || 'Úly' }}
+      {{ locationName }}
     </ion-title>
 
   </ion-toolbar>
@@ -14,49 +14,115 @@
 
 <ion-content class="ion-padding">
 
-  <!-- FORM -->
-  <ion-item>
-    <ion-input placeholder="Název úlu" [(ngModel)]="newBeehive.nazev"></ion-input>
-  </ion-item>
+  @if(beehives.length === 0){
 
-  <ion-item>
-    <ion-input placeholder="Číslo úlu" [(ngModel)]="newBeehive.cislo"></ion-input>
-  </ion-item>
+  <ion-card>
+    <ion-card-content class="ion-text-center">
+      Žádné úly
+    </ion-card-content>
+  </ion-card>
 
-  <ion-item>
-    <ion-input placeholder="Počet nástavků" [(ngModel)]="newBeehive.pocet_nastavku"></ion-input>
-  </ion-item>
+  }
 
-  <ion-button expand="block" (click)="add()">
-    Přidat úl
+  @for(hive of beehives; track hive.id){
+
+  <ion-card button (click)="openRecords(hive)">
+
+    <ion-card-header>
+
+      <ion-card-title>
+        Úl {{ hive.cislo }}
+  </ion-card-title>
+
+  <ion-card-subtitle>
+  {{ hive.nazev }}
+  </ion-card-subtitle>
+
+</ion-card-header>
+
+<ion-card-content>
+
+  @if(hive.poznamky){
+  <ion-note>
+    {{ hive.poznamky }}
+  </ion-note>
+  }
+
+  <ion-button
+    fill="clear"
+    color="danger"
+    size="small"
+    (click)="delete(hive.id); $event.stopPropagation()">
+    Smazat
   </ion-button>
 
-  <!-- LIST -->
-  <ion-list>
+</ion-card-content>
 
-    @for (h of beehives; track h.id) {
+</ion-card>
 
-    <ion-item>
-
-      <ion-label (click)="open(h)">
-        <h2>Úl {{ h.cislo }}</h2>
-          <p>{{ h.nazev }}</p>
-        </ion-label>
-
-        <ion-button color="danger" (click)="delete(h.id)">
-          🗑
-        </ion-button>
-
-      </ion-item>
-
-    } @empty {
-
-    <ion-item>
-      <ion-label>Žádné úly</ion-label>
-    </ion-item>
-
-    }
-
-  </ion-list>
+  }
 
 </ion-content>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+
+  <ion-fab-button (click)="openModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+
+</ion-fab>
+
+<ion-modal [isOpen]="isModalOpen">
+
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+
+        <ion-title>Nový úl</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            Zavřít
+          </ion-button>
+        </ion-buttons>
+
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <ion-item>
+        <ion-input
+          label="Číslo úlu"
+          labelPlacement="stacked"
+          type="number"
+          [(ngModel)]="newBeehive.cislo">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Název"
+          labelPlacement="stacked"
+          [(ngModel)]="newBeehive.nazev">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-textarea
+          label="Poznámky"
+          labelPlacement="stacked"
+          [(ngModel)]="newBeehive.poznamky">
+        </ion-textarea>
+      </ion-item>
+
+      <ion-button expand="block" (click)="save()">
+        Uložit
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+
+</ion-modal>

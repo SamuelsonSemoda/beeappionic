@@ -7,103 +7,100 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 
 @Component({
-  standalone: true,
   selector: 'app-home',
+  standalone: true,
   templateUrl: './home.page.html',
-  imports: [CommonModule, FormsModule, IonicModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule
+  ]
 })
 export class HomePage implements OnInit {
 
-  locations: any[] = [];
+  locations:any[] = [];
 
   isModalOpen = false;
 
-  newLocation: any = {
-    nazev: '',
-    lokace: '',
-    poznamky: ''
+  newLocation = {
+    nazev:'',
+    lokace:'',
+    poznamky:''
   };
 
   constructor(
-    private api: ApiService,
-    private router: Router
-  ) {}
+    private api:ApiService,
+    private router:Router
+  ){}
 
-  ngOnInit() {
-    this.load();
-    this.api.syncLocations();
-  }
-
-  ionViewWillEnter() {
+  ngOnInit(){
     this.load();
   }
 
-  async load() {
-
-    const data = await this.api.getLocations();
-
-    this.locations = data || [];
-
+  ionViewWillEnter(){
+    this.load();
   }
 
-  open(loc: any) {
+  async load(){
+    this.locations = await this.api.getLocations();
+  }
+
+  open(loc:any){
     this.router.navigate(['/beehives', loc.id]);
   }
 
-  openModal() {
+  openModal(){
     this.isModalOpen = true;
   }
 
-  closeModal() {
+  closeModal(){
     this.isModalOpen = false;
   }
 
-  async save() {
+  get totalHives(){
 
-    if (!this.newLocation.nazev) {
-      alert('Zadej název');
-      return;
-    }
-
-    try {
-
-      const res: any = await this.api.addLocation(this.newLocation);
-
-      this.locations.push(res);
-
-      this.newLocation = {
-        nazev: '',
-        lokace: '',
-        poznamky: ''
-      };
-
-      this.closeModal();
-
-    } catch (err:any) {
-
-      console.error(err);
-      alert('Chyba při ukládání');
-
-    }
+    return this.locations.reduce((sum,loc)=>{
+      return sum + (loc.beehives_count ?? loc.beehives?.length ?? 0);
+    },0);
 
   }
 
-  async delete(id: number) {
+  async save(){
 
-    if (!confirm('Opravdu smazat?')) return;
-
-    try {
-
-      await this.api.deleteLocation(id);
-
-      this.locations = this.locations.filter(l => l.id !== id);
-
-    } catch (err:any) {
-
-      console.error(err);
-      alert('Chyba při mazání');
-
+    if(!this.newLocation.nazev){
+      alert("Zadej název");
+      return;
     }
+
+    const saved = await this.api.addLocation(this.newLocation);
+
+    this.locations.push(saved);
+
+    this.newLocation = {
+      nazev:'',
+      lokace:'',
+      poznamky:''
+    };
+
+    this.closeModal();
+
+  }
+
+  async delete(id:number){
+
+    if(!confirm("Smazat stanoviště?")) return;
+
+    await this.api.deleteLocation(id);
+
+    this.locations = this.locations.filter(l => l.id !== id);
+
+  }
+
+  hiveWord(count:number){
+
+    if(count === 1) return "úl";
+    if(count >= 2 && count <= 4) return "úly";
+    return "úlů";
 
   }
 

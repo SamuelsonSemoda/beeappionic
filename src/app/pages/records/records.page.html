@@ -1,58 +1,154 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
 
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/beehives"></ion-back-button>
+      <ion-back-button></ion-back-button>
     </ion-buttons>
 
     <ion-title>
-      {{ beehiveName || 'Záznamy' }}
+      {{ beehiveName }}
     </ion-title>
 
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding">
 
-  <!-- FORM -->
-  <ion-item>
-    <ion-input placeholder="Typ akce (krmení, léčba...)" [(ngModel)]="newRecord.typ_akce"></ion-input>
-  </ion-item>
+  @if(records.length === 0){
 
-  <ion-item>
-    <ion-input type="date" [(ngModel)]="newRecord.datum"></ion-input>
-  </ion-item>
+  <ion-card>
+    <ion-card-content class="ion-text-center">
+      Žádné záznamy
+    </ion-card-content>
+  </ion-card>
 
-  <ion-button expand="block" (click)="add()">
-    Přidat záznam
+  }
+
+
+  @for(record of records; track record.id){
+
+  <ion-card>
+
+    <ion-card-header>
+
+      <ion-card-title>
+
+  {{ record.typ_akce }}
+
+  </ion-card-title>
+
+  <ion-card-subtitle>
+
+  {{ record.datum | date:'d.M.yyyy' }}
+
+  </ion-card-subtitle>
+
+</ion-card-header>
+
+
+<ion-card-content>
+
+  <p>
+
+  {{ record.popis }}
+
+  </p>
+
+  <ion-button
+    fill="clear"
+    color="danger"
+    size="small"
+    (click)="delete(record.id)">
+    Smazat
   </ion-button>
 
-  <!-- LIST -->
-  <ion-list>
+</ion-card-content>
 
-    @for (r of records; track r.id) {
+</ion-card>
 
-    <ion-item>
-
-      <ion-label>
-        <h2>{{ r.typ_akce }}</h2>
-          <p>{{ r.datum }}</p>
-        </ion-label>
-
-        <ion-button color="danger" (click)="delete(r.id)">
-          🗑
-        </ion-button>
-
-      </ion-item>
-
-    } @empty {
-
-    <ion-item>
-      <ion-label>Žádné záznamy</ion-label>
-    </ion-item>
-
-    }
-
-  </ion-list>
+  }
 
 </ion-content>
+
+
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+
+  <ion-fab-button (click)="openModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+
+</ion-fab>
+
+
+
+<ion-modal [isOpen]="isModalOpen">
+
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+
+        <ion-title>Nový záznam</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            Zavřít
+          </ion-button>
+        </ion-buttons>
+
+      </ion-toolbar>
+    </ion-header>
+
+
+    <ion-content class="ion-padding">
+
+      <ion-item>
+        <ion-select
+          label="Typ"
+          labelPlacement="stacked"
+          [(ngModel)]="newRecord.typ_akce">
+
+          <ion-select-option value="kontrola">
+            Kontrola
+          </ion-select-option>
+
+          <ion-select-option value="krmení">
+            Krmení
+          </ion-select-option>
+
+          <ion-select-option value="léčení">
+            Léčení
+          </ion-select-option>
+
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          type="date"
+          label="Datum"
+          labelPlacement="stacked"
+          [(ngModel)]="newRecord.datum">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-textarea
+          label="Popis"
+          labelPlacement="stacked"
+          [(ngModel)]="newRecord.popis">
+        </ion-textarea>
+      </ion-item>
+
+
+      <ion-button expand="block" (click)="save()">
+        Uložit
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+
+</ion-modal>

@@ -1,27 +1,33 @@
-#container {
-  text-align: center;
+.dashboard ion-card {
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  text-align:center;
+  border-radius:14px;
+
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.stat-number {
+
+  font-size:1.8rem;
+  font-weight:700;
+
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.stat-label {
 
-  color: #8c8c8c;
+  font-size:0.9rem;
+  color:#666;
 
-  margin: 0;
 }
 
-#container a {
-  text-decoration: none;
+.location-card {
+
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+
+}
+
+.delete-btn {
+
+  float:right;
+
 }

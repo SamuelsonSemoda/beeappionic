@@ -35,3 +35,16 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+ion-card {
+
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+
+}
+
+.delete-btn {
+
+  float:right;
+
+}

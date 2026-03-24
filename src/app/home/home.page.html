@@ -1,94 +1,176 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>🐝 Stanoviště</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>🐝 Beezy</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <!-- LIST -->
-  <ion-list>
+  <!-- DASHBOARD -->
 
-    @for (loc of locations; track loc.id) {
+  <ion-grid class="dashboard">
+    <ion-row>
 
-    <ion-item>
+      <ion-col>
+        <ion-card>
+          <ion-card-content class="stat">
+            <div class="stat-number">
+              {{ locations.length }}
+            </div>
+            <div class="stat-label">
+              Stanoviště
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
 
-      <!-- klik na detail -->
-      <ion-label (click)="open(loc)">
-        <h2>{{ loc.nazev }}</h2>
-          <p>{{ loc.lokace }}</p>
-        </ion-label>
+      <ion-col>
+        <ion-card>
+          <ion-card-content class="stat">
+            <div class="stat-number">
+              {{ totalHives }}
+            </div>
+            <div class="stat-label">
+              Úly
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
 
-        <!-- DELETE -->
-        <ion-button color="danger" (click)="delete(loc.id)">
-          🗑
-        </ion-button>
+    </ion-row>
+
+  </ion-grid>
+
+  <!-- SEZNAM STANOVIŠŤ -->
+
+  @if(locations.length === 0){
+
+  <ion-card>
+    <ion-card-content class="ion-text-center">
+      Žádná stanoviště
+    </ion-card-content>
+  </ion-card>
+
+  }
+
+  @for(loc of locations; track loc.id){
+
+  <ion-card button (click)="open(loc)" class="location-card">
+
+    <ion-card-header>
+
+      <ion-card-title>
+  {{ loc.nazev }}
+  </ion-card-title>
+
+  <ion-card-subtitle>
+  {{ loc.lokace }}
+  </ion-card-subtitle>
+
+</ion-card-header>
+
+
+<ion-card-content>
+
+  <ion-chip color="success">
+
+    🐝 {{ loc.beehives_count ?? loc.beehives?.length ?? 0 }}
+  {{ hiveWord(loc.beehives_count ?? loc.beehives?.length ?? 0) }}
+
+  </ion-chip>
+
+
+  <ion-button
+    fill="clear"
+    color="danger"
+    size="small"
+    class="delete-btn"
+    (click)="delete(loc.id); $event.stopPropagation()"
+  >
+    Smazat
+  </ion-button>
+
+</ion-card-content>
+
+</ion-card>
+
+  }
+
+</ion-content>
+
+<!-- FAB ADD BUTTON -->
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+
+  <ion-fab-button (click)="openModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+
+</ion-fab>
+
+<!-- MODAL -->
+
+<ion-modal [isOpen]="isModalOpen">
+
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+
+        <ion-title>Nové stanoviště</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            Zavřít
+          </ion-button>
+        </ion-buttons>
+
+      </ion-toolbar>
+    </ion-header>
+
+
+    <ion-content class="ion-padding">
+
+      <ion-item>
+
+        <ion-input
+          label="Název"
+          labelPlacement="stacked"
+          [(ngModel)]="newLocation.nazev">
+        </ion-input>
 
       </ion-item>
 
-    } @empty {
 
-    <ion-item>
-      <ion-label>Žádná stanoviště</ion-label>
-    </ion-item>
+      <ion-item>
 
-    }
+        <ion-input
+          label="Lokace"
+          labelPlacement="stacked"
+          [(ngModel)]="newLocation.lokace">
+        </ion-input>
 
-  </ion-list>
+      </ion-item>
 
-  <!-- FLOAT BUTTON -->
-  <ion-fab vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openModal()">
-      +
-    </ion-fab-button>
-  </ion-fab>
 
-  <!-- MODAL -->
-  <ion-modal [isOpen]="isModalOpen">
+      <ion-item>
 
-    <ng-template>
+        <ion-textarea
+          label="Poznámky"
+          labelPlacement="stacked"
+          [(ngModel)]="newLocation.poznamky">
+        </ion-textarea>
 
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Přidat stanoviště</ion-title>
-        </ion-toolbar>
-      </ion-header>
+      </ion-item>
 
-      <ion-content class="ion-padding">
 
-        <ion-item>
-          <ion-input
-            placeholder="Název"
-            [(ngModel)]="newLocation.nazev">
-          </ion-input>
-        </ion-item>
+      <ion-button expand="block" (click)="save()">
 
-        <ion-item>
-          <ion-input
-            placeholder="Lokace"
-            [(ngModel)]="newLocation.lokace">
-          </ion-input>
-        </ion-item>
+        Uložit
 
-        <ion-item>
-          <ion-input
-            placeholder="Poznámky"
-            [(ngModel)]="newLocation.poznamky">
-          </ion-input>
-        </ion-item>
+      </ion-button>
 
-        <ion-button expand="block" (click)="save()">
-          Uložit
-        </ion-button>
+    </ion-content>
 
-        <ion-button expand="block" color="medium" (click)="closeModal()">
-          Zrušit
-        </ion-button>
+  </ng-template>
 
-      </ion-content>
-
-    </ng-template>
-
-  </ion-modal>
-
-</ion-content>
+</ion-modal>

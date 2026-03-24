@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 
 import { ApiService } from '../../../services/api.service';
 
@@ -10,17 +10,23 @@ import { ApiService } from '../../../services/api.service';
   standalone: true,
   selector: 'app-records',
   templateUrl: './records.page.html',
-  imports: [CommonModule, IonicModule, FormsModule]
+  imports: [CommonModule, FormsModule, IonicModule]
 })
-export class RecordsPage {
+export class RecordsPage implements OnInit {
+
+  beehiveId!: number;
+
+  beehiveName = '';
 
   records: any[] = [];
-  beehiveId: any;
-  beehiveName: string = '';
 
-  newRecord: any = {
-    typ_akce: '',
-    datum: ''
+  isModalOpen = false;
+
+  newRecord:any = {
+    typ_akce:'kontrola',
+    datum:'',
+    popis:'',
+    beehive_id:null
   };
 
   constructor(
@@ -28,58 +34,77 @@ export class RecordsPage {
     private api: ApiService
   ) {}
 
+  ngOnInit() {
+
+    this.beehiveId = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.newRecord.beehive_id = this.beehiveId;
+
+    this.load();
+
+  }
+
   ionViewWillEnter() {
-    this.beehiveId = this.route.snapshot.paramMap.get('id');
     this.load();
   }
 
-  async load() {
+  async load(){
 
-    const data = await this.api.getLocations();
+    const locations = await this.api.getLocations();
 
-    let found:any = null;
+    for(const loc of locations){
 
-    data.forEach((loc:any)=>{
+      const hive = loc.beehives?.find((b:any)=>b.id == this.beehiveId);
 
-      loc.beehives?.forEach((h:any)=>{
+      if(hive){
 
-        if(h.id == this.beehiveId){
-          found = h;
-        }
+        this.beehiveName = `Úl ${hive.cislo}`;
 
-      });
+        this.records = hive.records || [];
 
-    });
+      }
 
-    this.beehiveName = found?.nazev || 'Záznamy';
-    this.records = found?.records || [];
+    }
 
   }
 
-  add() {
+  openModal() {
+    this.isModalOpen = true;
+  }
 
-    if (!this.newRecord.typ_akce || !this.newRecord.datum) return;
+  closeModal() {
+    this.isModalOpen = false;
+  }
 
-    const data = {
-      beehive_id: this.beehiveId,
-      typ_akce: this.newRecord.typ_akce,
-      datum: this.newRecord.datum
+  async save(){
+
+    const res: any = await this.api.addRecord(this.newRecord);
+
+    this.records.unshift({
+      id: res.id,
+      typ_akce: res.typ_akce,
+      datum: res.datum,
+      popis: res.popis
+    });
+
+    this.newRecord = {
+      typ_akce: 'kontrola',
+      datum: '',
+      popis: '',
+      beehive_id: this.beehiveId
     };
 
-    this.api.addRecord(data).subscribe((res: any) => {
-      this.records.unshift(res);
-      this.newRecord = { typ_akce: '', datum: '' };
-    });
+    this.closeModal();
 
   }
 
-  delete(id: number) {
+  async delete(id: number) {
 
-    if (!confirm('Opravdu smazat?')) return;
+    if (!confirm('Smazat záznam?')) return;
 
-    this.api.deleteRecord(id).subscribe(() => {
-      this.records = this.records.filter(r => r.id !== id);
-    });
+    await this.api.deleteRecord(id);
+
+    this.records = this.records.filter(r => r.id !== id);
 
   }
 

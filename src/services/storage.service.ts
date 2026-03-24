@@ -13,20 +13,16 @@ export class StorageService {
   }
 
   async init() {
-    const store = await this.storage.create();
-    this._storage = store;
+    const storage = await this.storage.create();
+    this._storage = storage;
   }
 
-  async set(key: string, value: any) {
-    return await this._storage?.set(key, value);
+  async get(key:string){
+    return this._storage?.get(key);
   }
 
-  async get(key: string) {
-    return await this._storage?.get(key);
-  }
-
-  async remove(key: string) {
-    return await this._storage?.remove(key);
+  async set(key:string,value:any){
+    return this._storage?.set(key,value);
   }
 
 }
