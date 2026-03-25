@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { environment } from '../../../environments/environment';
 import { ApiService } from '../../../services/api.service';
 
 // npm install qrcode @types/qrcode
@@ -98,12 +98,17 @@ export class BeehivesPage implements OnInit {
     this.qrDataUrl = '';
     this.isQrModalOpen = true;
 
-    this.qrDataUrl = await QRCode.toDataURL(
-      `https://app.beezy.cz/records/${hive.id}`,
-      { width: 400, margin: 2, color: { dark: '#1a1a1a', light: '#ffffff' } }
-    );
-  }
+    const url = `${environment.appUrl}/records/${hive.id}`;
 
+    this.qrDataUrl = await QRCode.toDataURL(url, {
+      width: 400,
+      margin: 2,
+      color: {
+        dark: '#1a1a1a',
+        light: '#ffffff'
+      }
+    });
+  }
   closeQrModal() {
     this.isQrModalOpen = false;
     this.qrHive = null;

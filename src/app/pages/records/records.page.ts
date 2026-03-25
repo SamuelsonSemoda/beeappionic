@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
-
+import { environment } from '../../../environments/environment';
 import { ApiService } from '../../../services/api.service';
 
 @Component({
@@ -77,27 +77,36 @@ export class RecordsPage implements OnInit {
   }
 
   async save(){
+    try {
+      //console.log('Odesílám:', this.newRecord);
+      //console.log('API URL:', environment.apiUrl);
 
-    const res:any = await this.api.addRecord(this.newRecord);
+      const res:any = await this.api.addRecord(this.newRecord);
+      //console.log('Odpověď:', res);
 
-    const record = {
-      id: res.id,
-      typ_akce: res.typ_akce,
-      datum: res.datum,
-      popis: res.popis
-    };
+      const record = {
+        id: res.id,
+        typ_akce: res.typ_akce,
+        datum: res.datum,
+        popis: res.popis
+      };
 
-    this.records = [record, ...this.records];
+      this.records = [record, ...this.records];
 
-    this.newRecord = {
-      typ_akce:'kontrola',
-      datum:'',
-      popis:'',
-      beehive_id:this.beehiveId
-    };
+      this.newRecord = {
+        typ_akce: 'kontrola',
+        datum: '',
+        popis: '',
+        beehive_id: this.beehiveId
+      };
 
-    this.closeModal();
+      this.closeModal();
 
+    } catch(e: any) {
+      console.error('Chyba při ukládání:', e);
+      console.error('Status:', e?.status);
+      console.error('Body:', e?.error);
+    }
   }
 
   async delete(id: number) {
