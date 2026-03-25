@@ -15,78 +15,71 @@
 <ion-content class="ion-padding">
 
   @if(beehives.length === 0){
-
   <ion-card>
     <ion-card-content class="ion-text-center">
       Žádné úly
     </ion-card-content>
   </ion-card>
-
   }
 
   @for(hive of beehives; track hive.id){
-
   <ion-card button (click)="openRecords(hive)">
 
     <ion-card-header>
+      <ion-card-title>Úl {{ hive.cislo }}</ion-card-title>
+        <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
+      </ion-card-header>
 
-      <ion-card-title>
-        Úl {{ hive.cislo }}
-  </ion-card-title>
+      <ion-card-content>
 
-  <ion-card-subtitle>
-  {{ hive.nazev }}
-  </ion-card-subtitle>
-
-</ion-card-header>
-
-<ion-card-content>
-
-  @if(hive.poznamky){
-  <ion-note>
-    {{ hive.poznamky }}
-  </ion-note>
+        @if(hive.poznamky){
+  <ion-note>{{ hive.poznamky }}</ion-note>
   }
 
-  <ion-button
-    fill="clear"
-    color="danger"
-    size="small"
-    (click)="delete(hive.id); $event.stopPropagation()">
-    Smazat
-  </ion-button>
+  <div class="card-actions">
+
+    <ion-button
+      fill="clear"
+      color="medium"
+      size="small"
+      (click)="openQr(hive, $event)">
+      <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+      QR kód
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="danger"
+      size="small"
+      (click)="delete(hive.id); $event.stopPropagation()">
+      Smazat
+    </ion-button>
+
+  </div>
 
 </ion-card-content>
 
 </ion-card>
-
   }
 
 </ion-content>
 
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-
   <ion-fab-button (click)="openModal()">
     <ion-icon name="add"></ion-icon>
   </ion-fab-button>
-
 </ion-fab>
 
+<!-- MODAL: Nový úl -->
 <ion-modal [isOpen]="isModalOpen">
-
   <ng-template>
 
     <ion-header>
       <ion-toolbar>
-
         <ion-title>Nový úl</ion-title>
-
         <ion-buttons slot="end">
-          <ion-button (click)="closeModal()">
-            Zavřít
-          </ion-button>
+          <ion-button (click)="closeModal()">Zavřít</ion-button>
         </ion-buttons>
-
       </ion-toolbar>
     </ion-header>
 
@@ -124,5 +117,57 @@
     </ion-content>
 
   </ng-template>
+</ion-modal>
 
+<!-- MODAL: QR kód -->
+<ion-modal
+  [isOpen]="isQrModalOpen"
+  (didDismiss)="closeQrModal()"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6">
+
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>
+          @if(qrHive){
+          QR — Úl {{ qrHive.cislo }}
+          }
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeQrModal()">Zavřít</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <div class="qr-wrapper">
+
+        @if(qrDataUrl){
+
+        <img [src]="qrDataUrl" class="qr-image" alt="QR kód úlu" />
+
+        <p class="qr-label">
+          @if(qrHive?.nazev){
+        {{ qrHive.nazev }} —
+        }
+        Úl č. {{ qrHive?.cislo }}
+        </p>
+
+        <ion-button expand="block" (click)="downloadQr()">
+          <ion-icon slot="start" name="download-outline"></ion-icon>
+          Stáhnout PNG
+        </ion-button>
+
+        } @else {
+        <div class="qr-loading">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+        }
+
+      </div>
+    </ion-content>
+
+  </ng-template>
 </ion-modal>

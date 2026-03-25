@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { StorageService } from './storage.service';
 import { firstValueFrom } from 'rxjs';
+import { StorageService } from './storage.service';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,118 +13,205 @@ export class ApiService {
 
   constructor(
     private http: HttpClient,
-    private storage: StorageService
+    private storage: StorageService,
+    private network: NetworkService
   ) {}
 
-  /* LOCATIONS */
-  async getLocations() {
+  // ----------------------------------------------------------------
+  // LOCATIONS
+  // ----------------------------------------------------------------
 
-    let cached = await this.storage.get('locations');
+  async getLocations(): Promise<any[]> {
 
-    if (navigator.onLine) {
+    const cached = await this.storage.get('locations');
 
+    if (this.network.isOnline) {
       try {
-
-        // Načítáme locations s beehives a jejich records (eager loading na backendu)
         const data: any = await firstValueFrom(
           this.http.get(`${this.api}/locations`)
         );
-
         await this.storage.set('locations', data);
-
         return data;
-
-      } catch (e) {
-
-        console.warn('API failed, using cache');
-
+      } catch {
+        console.warn('API nedostupné, používám cache');
         return cached || [];
-
       }
-
     }
 
     return cached || [];
 
   }
 
-  async addLocation(data: any) {
+  async addLocation(data: any): Promise<any> {
 
-    if (navigator.onLine) {
+    if (this.network.isOnline) {
 
-      return await firstValueFrom(
+      const saved: any = await firstValueFrom(
         this.http.post(`${this.api}/locations`, data)
       );
 
-    } else {
-
-      let locations = await this.storage.get('locations') || [];
-
-      data.offline = true;
-      data.id = Date.now();
-
-      locations.push(data);
-
+      const locations = await this.storage.get('locations') || [];
+      locations.push(saved);
       await this.storage.set('locations', locations);
 
-      return data;
+      return saved;
+
+    } else {
+
+      const action = await this.network.enqueue({ type: 'addLocation', payload: data });
+
+      const locations = await this.storage.get('locations') || [];
+      const tempItem = { ...data, id: action.id, beehives: [], beehives_count: 0, _offline: true };
+      locations.push(tempItem);
+      await this.storage.set('locations', locations);
+
+      return tempItem;
 
     }
 
   }
 
-  async deleteLocation(id: number) {
+  async deleteLocation(id: any): Promise<void> {
 
-    return await firstValueFrom(
-      this.http.delete(`${this.api}/locations/${id}`)
-    );
+    const locations = await this.storage.get('locations') || [];
+    await this.storage.set('locations', locations.filter((l: any) => l.id !== id));
 
-  }
-
-  /* BEEHIVES */
-  getBeehives(locationId: number) {
-    return firstValueFrom(
-      this.http.get(`${this.api}/locations/${locationId}/beehives`)
-    );
-  }
-
-  async addBeehive(data: any) {
-
-    return await firstValueFrom(
-      this.http.post(`${this.api}/beehives`, data)
-    );
+    if (this.network.isOnline) {
+      await firstValueFrom(this.http.delete(`${this.api}/locations/${id}`));
+    } else {
+      if (!String(id).startsWith('offline_')) {
+        await this.network.enqueue({ type: 'deleteLocation', payload: { id } });
+      }
+    }
 
   }
 
-  async deleteBeehive(id: number) {
+  // ----------------------------------------------------------------
+  // BEEHIVES
+  // ----------------------------------------------------------------
 
-    return await firstValueFrom(
-      this.http.delete(`${this.api}/beehives/${id}`)
-    );
+  async addBeehive(data: any): Promise<any> {
+
+    if (this.network.isOnline) {
+
+      const saved: any = await firstValueFrom(
+        this.http.post(`${this.api}/beehives`, data)
+      );
+
+      const locations = await this.storage.get('locations') || [];
+      const loc = locations.find((l: any) => l.id == data.location_id);
+      if (loc) {
+        loc.beehives = loc.beehives || [];
+        loc.beehives.push(saved);
+        loc.beehives_count = (loc.beehives_count || 0) + 1;
+      }
+      await this.storage.set('locations', locations);
+
+      return saved;
+
+    } else {
+
+      const action = await this.network.enqueue({ type: 'addBeehive', payload: data });
+
+      const locations = await this.storage.get('locations') || [];
+      const loc = locations.find((l: any) => l.id == data.location_id);
+      if (loc) {
+        loc.beehives = loc.beehives || [];
+        const tempItem = { ...data, id: action.id, records: [], _offline: true };
+        loc.beehives.push(tempItem);
+        loc.beehives_count = (loc.beehives_count || 0) + 1;
+      }
+      await this.storage.set('locations', locations);
+
+      return { ...data, id: action.id, _offline: true };
+
+    }
 
   }
 
-  /* RECORDS */
-  getRecords(beehiveId: number) {
-    return firstValueFrom(
-      this.http.get(`${this.api}/beehives/${beehiveId}/records`)
-    );
+  async deleteBeehive(id: any): Promise<void> {
+
+    const locations = await this.storage.get('locations') || [];
+    for (const loc of locations) {
+      if (loc.beehives) {
+        const before = loc.beehives.length;
+        loc.beehives = loc.beehives.filter((b: any) => b.id !== id);
+        loc.beehives_count -= (before - loc.beehives.length);
+      }
+    }
+    await this.storage.set('locations', locations);
+
+    if (this.network.isOnline) {
+      await firstValueFrom(this.http.delete(`${this.api}/beehives/${id}`));
+    } else {
+      if (!String(id).startsWith('offline_')) {
+        await this.network.enqueue({ type: 'deleteBeehive', payload: { id } });
+      }
+    }
+
   }
 
-  async addRecord(data: any) {
+  // ----------------------------------------------------------------
+  // RECORDS
+  // ----------------------------------------------------------------
 
-    // Správná nested URL dle Laravel route: /beehives/{beehive}/records
-    return await firstValueFrom(
-      this.http.post(`${this.api}/beehives/${data.beehive_id}/records`, data)
-    );
+  async addRecord(data: any): Promise<any> {
+
+    if (this.network.isOnline) {
+
+      const saved: any = await firstValueFrom(
+        this.http.post(`${this.api}/beehives/${data.beehive_id}/records`, data)
+      );
+
+      const locations = await this.storage.get('locations') || [];
+      for (const loc of locations) {
+        const hive = loc.beehives?.find((b: any) => b.id == data.beehive_id);
+        if (hive) {
+          hive.records = hive.records || [];
+          hive.records.unshift(saved);
+        }
+      }
+      await this.storage.set('locations', locations);
+
+      return saved;
+
+    } else {
+
+      const action = await this.network.enqueue({ type: 'addRecord', payload: data });
+
+      const locations = await this.storage.get('locations') || [];
+      for (const loc of locations) {
+        const hive = loc.beehives?.find((b: any) => b.id == data.beehive_id);
+        if (hive) {
+          hive.records = hive.records || [];
+          hive.records.unshift({ ...data, id: action.id, _offline: true });
+        }
+      }
+      await this.storage.set('locations', locations);
+
+      return { ...data, id: action.id, _offline: true };
+
+    }
 
   }
 
-  async deleteRecord(id: number) {
+  async deleteRecord(id: any): Promise<void> {
 
-    return await firstValueFrom(
-      this.http.delete(`${this.api}/records/${id}`)
-    );
+    const locations = await this.storage.get('locations') || [];
+    for (const loc of locations) {
+      for (const hive of loc.beehives || []) {
+        hive.records = (hive.records || []).filter((r: any) => r.id !== id);
+      }
+    }
+    await this.storage.set('locations', locations);
+
+    if (this.network.isOnline) {
+      await firstValueFrom(this.http.delete(`${this.api}/records/${id}`));
+    } else {
+      if (!String(id).startsWith('offline_')) {
+        await this.network.enqueue({ type: 'deleteRecord', payload: { id } });
+      }
+    }
 
   }
 

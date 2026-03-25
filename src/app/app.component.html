@@ -1,3 +1,19 @@
 <ion-app>
+
   <ion-router-outlet></ion-router-outlet>
+
+  @if(!(network.isOnline$ | async)){
+  <div class="status-banner offline">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <span>Offline režim — změny se uloží po připojení</span>
+  </div>
+  }
+
+  @if((network.isOnline$ | async) && syncing){
+  <div class="status-banner syncing">
+    <ion-spinner name="crescent"></ion-spinner>
+    <span>Synchronizuji změny…</span>
+  </div>
+  }
+
 </ion-app>
