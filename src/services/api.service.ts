@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from './storage.service';
+import {environment} from "../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  api = 'https://app.beezy.cz/api';
+  private api = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
