@@ -122,8 +122,8 @@
 <ion-modal
   [isOpen]="isQrModalOpen"
   (didDismiss)="closeQrModal()"
-  [breakpoints]="[0, 0.6]"
-  [initialBreakpoint]="0.6">
+  [breakpoints]="[0, 0.7]"
+  [initialBreakpoint]="0.7">
 
   <ng-template>
 
@@ -131,7 +131,7 @@
       <ion-toolbar>
         <ion-title>
           @if(qrHive){
-          QR — Úl {{ qrHive.cislo }}
+          QR — Úl č. {{ qrHive.cislo }}
           }
         </ion-title>
         <ion-buttons slot="end">
