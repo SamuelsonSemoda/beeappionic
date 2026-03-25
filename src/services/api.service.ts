@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from './storage.service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,10 @@ export class ApiService {
 
       try {
 
-        const data: any = await this.http
-          .get(`${this.api}/locations`)
-          .toPromise();
+        // Načítáme locations s beehives a jejich records (eager loading na backendu)
+        const data: any = await firstValueFrom(
+          this.http.get(`${this.api}/locations`)
+        );
 
         await this.storage.set('locations', data);
 
@@ -45,13 +47,13 @@ export class ApiService {
 
   }
 
-
-
   async addLocation(data: any) {
 
     if (navigator.onLine) {
 
-      return await this.http.post(`${this.api}/locations`, data).toPromise();
+      return await firstValueFrom(
+        this.http.post(`${this.api}/locations`, data)
+      );
 
     } else {
 
@@ -70,71 +72,59 @@ export class ApiService {
 
   }
 
-  async syncLocations() {
+  async deleteLocation(id: number) {
 
-    if (!navigator.onLine) return;
+    return await firstValueFrom(
+      this.http.delete(`${this.api}/locations/${id}`)
+    );
 
-    let locations = await this.storage.get('locations') || [];
-
-    for (let loc of locations) {
-
-      if (loc.offline) {
-
-        await this.http.post(`${this.api}/locations`, loc).toPromise();
-
-        loc.offline = false;
-
-      }
-
-    }
-
-    await this.storage.set('locations', locations);
-
-  }
-
-  deleteLocation(id:number){
-    return this.http.delete(`${this.api}/locations/${id}`);
   }
 
   /* BEEHIVES */
-  getBeehives(locationId:number){
-    return this.http.get(`${this.api}/locations/${locationId}/beehives`);
+  getBeehives(locationId: number) {
+    return firstValueFrom(
+      this.http.get(`${this.api}/locations/${locationId}/beehives`)
+    );
   }
 
-  async addBeehive(data:any){
+  async addBeehive(data: any) {
 
-    const res = await fetch(this.api + '/beehives', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify(data)
-    });
-
-    return res.json();
+    return await firstValueFrom(
+      this.http.post(`${this.api}/beehives`, data)
+    );
 
   }
 
+  async deleteBeehive(id: number) {
 
-  async deleteBeehive(id:number){
-
-    await fetch(this.api + '/beehives/' + id,{
-      method:'DELETE'
-    });
+    return await firstValueFrom(
+      this.http.delete(`${this.api}/beehives/${id}`)
+    );
 
   }
 
   /* RECORDS */
-  getRecords(beehiveId:number){
-    return this.http.get(`${this.api}/beehives/${beehiveId}/records`);
+  getRecords(beehiveId: number) {
+    return firstValueFrom(
+      this.http.get(`${this.api}/beehives/${beehiveId}/records`)
+    );
   }
 
-  addRecord(data:any){
-    return this.http.post(`${this.api}/records`, data);
+  async addRecord(data: any) {
+
+    // Správná nested URL dle Laravel route: /beehives/{beehive}/records
+    return await firstValueFrom(
+      this.http.post(`${this.api}/beehives/${data.beehive_id}/records`, data)
+    );
+
   }
 
-  deleteRecord(id:number){
-    return this.http.delete(`${this.api}/records/${id}`);
+  async deleteRecord(id: number) {
+
+    return await firstValueFrom(
+      this.http.delete(`${this.api}/records/${id}`)
+    );
+
   }
 
 }
