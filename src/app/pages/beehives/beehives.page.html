@@ -26,7 +26,7 @@
   <ion-card button (click)="openRecords(hive)">
 
     <ion-card-header>
-      <ion-card-title>Úl {{ hive.cislo }}</ion-card-title>
+      <ion-card-title>Úl č. {{ hive.cislo }}</ion-card-title>
         <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
       </ion-card-header>
 
@@ -40,7 +40,6 @@
 
     <ion-button
       fill="clear"
-      color="medium"
       size="small"
       (click)="openQr(hive, $event)">
       <ion-icon slot="start" name="qr-code-outline"></ion-icon>

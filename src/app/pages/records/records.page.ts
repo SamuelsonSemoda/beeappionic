@@ -82,18 +82,18 @@ export class RecordsPage implements OnInit {
 
     const record = {
       id: res.id,
-      typ_akce: res.typ_akce || this.newRecord.typ_akce,
-      datum: res.datum || this.newRecord.datum,
-      popis: res.popis || this.newRecord.popis
+      typ_akce: res.typ_akce,
+      datum: res.datum,
+      popis: res.popis
     };
 
     this.records = [record, ...this.records];
 
     this.newRecord = {
-      typ_akce: 'kontrola',
-      datum: '',
-      popis: '',
-      beehive_id: this.beehiveId
+      typ_akce:'kontrola',
+      datum:'',
+      popis:'',
+      beehive_id:this.beehiveId
     };
 
     this.closeModal();
