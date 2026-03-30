@@ -79,7 +79,6 @@ export class ApiService {
   /* RECORDS */
 
   async addRecord(data: any) {
-    // Správná nested URL + firstValueFrom = vrací Promise s daty
     return await firstValueFrom(
       this.http.post(`${this.api}/beehives/${data.beehive_id}/records`, data)
     );

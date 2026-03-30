@@ -5,13 +5,14 @@ import { firstValueFrom } from 'rxjs';
 import { NetworkService } from './network.service';
 import { StorageService } from './storage.service';
 import { ToastController } from '@ionic/angular';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SyncService {
 
-  api = 'https://app.beezy.cz/api';
+  api = environment.apiUrl;
 
   private _syncing = new BehaviorSubject<boolean>(false);
   syncing$ = this._syncing.asObservable();

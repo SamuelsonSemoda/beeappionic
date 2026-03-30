@@ -36,7 +36,6 @@
   }
 }
 
-// Posuneme ion-router-outlet dolů o výšku banneru když je vidět
 :host-context(ion-app) ion-router-outlet {
   margin-top: 0;
 }
