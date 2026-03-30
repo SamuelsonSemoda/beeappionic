@@ -1,4 +1,4 @@
 # BeeInformed - Frontend version
-## Ionic + Angular**
+## Ionic + Angular
 
-Created by Beezy.cz
+**Created by Beezy.cz**
