@@ -1,0 +1,56 @@
+<ion-content class="ion-padding login-content">
+
+  <div class="login-wrapper">
+
+    <div class="login-logo">
+      🐝
+    </div>
+
+    <h1 class="login-title">BeeInformed</h1>
+    <p class="login-subtitle">Přihlas se ke svému účtu</p>
+
+    @if(error){
+      <ion-card color="danger">
+        <ion-card-content>
+          {{ error }}
+        </ion-card-content>
+      </ion-card>
+    }
+
+    <ion-item>
+      <ion-input
+        label="Email"
+        labelPlacement="stacked"
+        type="email"
+        [(ngModel)]="email"
+        autocomplete="email">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Heslo"
+        labelPlacement="stacked"
+        type="password"
+        [(ngModel)]="password"
+        (keyup.enter)="login()">
+      </ion-input>
+    </ion-item>
+
+    <ion-button
+      expand="block"
+      class="login-btn"
+      [disabled]="loading"
+      (click)="login()">
+
+      @if(loading){
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        Přihlásit se
+      }
+
+    </ion-button>
+
+  </div>
+
+</ion-content>

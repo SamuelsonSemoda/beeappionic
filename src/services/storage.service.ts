@@ -8,21 +8,27 @@ export class StorageService {
 
   private _storage: Storage | null = null;
 
-  constructor(private storage: Storage) {
-    this.init();
-  }
+  constructor(private storage: Storage) {}
 
   async init() {
-    const storage = await this.storage.create();
-    this._storage = storage;
+    if (!this._storage) {
+      this._storage = await this.storage.create();
+    }
   }
 
-  async get(key:string){
+  async get(key: string) {
+    await this.init();
     return this._storage?.get(key);
   }
 
-  async set(key:string,value:any){
-    return this._storage?.set(key,value);
+  async set(key: string, value: any) {
+    await this.init();
+    return this._storage?.set(key, value);
+  }
+
+  async remove(key: string) {
+    await this.init();
+    return this._storage?.remove(key);
   }
 
 }

@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'API_URL',
-  apiKey: 'API_KEY',
-  appUrl: 'APP_URL'
+  apiUrl: 'https://app.beezy.cz/api',
+  apiKey: 'PQ09A6jptiDI1cLq6IpOL2uOctevRQbLyl9vrGGQq1p2ZWzA6SETO6wnP4FcqkU0',
+  appUrl: 'https://beeinformed-beezy.web.app',
+  authEnabled: true
 };
 
 /*
