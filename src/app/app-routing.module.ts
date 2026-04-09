@@ -1,14 +1,17 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { environment } from 'src/environments/environment';
 
 const routes: Routes = [
 
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.page').then(m => m.LoginPage)
-  },
+  ...(environment.authEnabled ? [
+    {
+      path: 'login',
+      loadComponent: () =>
+        import('./pages/login/login.page').then(m => m.LoginPage)
+    }
+  ] : []),
 
   {
     path: '',
