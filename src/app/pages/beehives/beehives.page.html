@@ -27,13 +27,23 @@
 
     <ion-card-header>
       <ion-card-title>Úl č. {{ hive.cislo }}</ion-card-title>
-        <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
-      </ion-card-header>
+      <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
+    </ion-card-header>
 
-      <ion-card-content>
+    <ion-card-content>
 
-        @if(hive.poznamky){
+      @if(hive.poznamky){
   <ion-note>{{ hive.poznamky }}</ion-note>
+  }
+
+  <!-- Badge poslední/aktivní práce – pouze pokud má úl záznam z této práce -->
+  @if(getHiveSessionBadge(hive); as badge){
+  <div style="margin: 8px 0;">
+    <ion-chip [color]="badge.color">
+      <ion-icon name="construct-outline" style="margin-right: 6px;"></ion-icon>
+      {{ badge.label }}
+    </ion-chip>
+  </div>
   }
 
   <div class="card-actions">

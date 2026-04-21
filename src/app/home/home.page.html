@@ -12,170 +12,161 @@
 <ion-content class="ion-padding">
 
   <!-- DASHBOARD -->
-
   <ion-grid class="dashboard">
     <ion-row>
-
       <ion-col>
         <ion-card>
           <ion-card-content class="stat">
-            <div class="stat-number">
-              {{ locations.length }}
-            </div>
-            <div class="stat-label">
-              Stanoviště
-            </div>
+            <div class="stat-number">{{ locations.length }}</div>
+            <div class="stat-label">Stanoviště</div>
           </ion-card-content>
         </ion-card>
       </ion-col>
-
       <ion-col>
         <ion-card>
           <ion-card-content class="stat">
-            <div class="stat-number">
-              {{ totalHives }}
-            </div>
-            <div class="stat-label">
-              Úly
-            </div>
+            <div class="stat-number">{{ totalHives }}</div>
+            <div class="stat-label">Úly</div>
           </ion-card-content>
         </ion-card>
       </ion-col>
-
     </ion-row>
-
   </ion-grid>
 
-  <!-- SEZNAM STANOVIŠŤ -->
-
   @if(locations.length === 0){
-
-  <ion-card>
-    <ion-card-content class="ion-text-center">
-      Žádná stanoviště
-    </ion-card-content>
-  </ion-card>
-
+    <ion-card>
+      <ion-card-content class="ion-text-center">
+        Žádná stanoviště
+      </ion-card-content>
+    </ion-card>
   }
 
   @for(loc of locations; track loc.id){
+    <ion-card button (click)="open(loc)" class="location-card">
 
-  <ion-card button (click)="open(loc)" class="location-card">
+      <ion-card-header>
+        <ion-card-title>{{ loc.nazev }}</ion-card-title>
+        <ion-card-subtitle>{{ loc.lokace }}</ion-card-subtitle>
+      </ion-card-header>
 
-    <ion-card-header>
+      <ion-card-content>
 
-      <ion-card-title>
-  {{ loc.nazev }}
-  </ion-card-title>
+        <ion-chip color="success">
+          🐝 {{ loc.beehives_count ?? loc.beehives?.length ?? 0 }}
+          {{ hiveWord(loc.beehives_count ?? loc.beehives?.length ?? 0) }}
+        </ion-chip>
 
-  <ion-card-subtitle>
-  {{ loc.lokace }}
-  </ion-card-subtitle>
+        <!-- Indikátor aktivní práce -->
+        @if(workSession.isActive(loc.id)){
+          <div class="work-indicator">
+            <div class="work-dot"></div>
+            <span class="work-label">
+              {{ workSession.getActiveSession(loc.id)?.nazev }}
+              · {{ getElapsed(loc.id) }}
+            </span>
+            <ion-button
+              fill="clear"
+              color="danger"
+              size="small"
+              (click)="stopWork(loc.id, $event)">
+              <ion-icon name="stop-circle-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        }
 
-</ion-card-header>
+        <div class="card-actions">
+          <!-- Tlačítko spustit práci -->
+          <ion-button
+            fill="clear"
+            color="warning"
+            size="small"
+            (click)="openWorkModal(loc, $event)">
+            <ion-icon slot="start" name="construct-outline"></ion-icon>
+            {{ workSession.isActive(loc.id) ? 'Nová práce' : 'Zahájit práci' }}
+          </ion-button>
 
+          <ion-button
+            fill="clear"
+            color="danger"
+            size="small"
+            class="delete-btn"
+            (click)="delete(loc.id); $event.stopPropagation()">
+            Smazat
+          </ion-button>
+        </div>
 
-<ion-card-content>
+      </ion-card-content>
 
-  <ion-chip color="success">
-
-    🐝 {{ loc.beehives_count ?? loc.beehives?.length ?? 0 }}
-  {{ hiveWord(loc.beehives_count ?? loc.beehives?.length ?? 0) }}
-
-  </ion-chip>
-
-
-  <ion-button
-    fill="clear"
-    color="danger"
-    size="small"
-    class="delete-btn"
-    (click)="delete(loc.id); $event.stopPropagation()"
-  >
-    Smazat
-  </ion-button>
-
-</ion-card-content>
-
-</ion-card>
-
+    </ion-card>
   }
 
 </ion-content>
 
 <!-- FAB ADD BUTTON -->
-
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-
   <ion-fab-button (click)="openModal()">
     <ion-icon name="add"></ion-icon>
   </ion-fab-button>
-
 </ion-fab>
 
-<!-- MODAL -->
-
+<!-- MODAL: Nové stanoviště -->
 <ion-modal [isOpen]="isModalOpen">
-
   <ng-template>
     <ion-header>
       <ion-toolbar>
-
         <ion-title>Nové stanoviště</ion-title>
-
         <ion-buttons slot="end">
-          <ion-button (click)="closeModal()">
-            Zavřít
-          </ion-button>
+          <ion-button (click)="closeModal()">Zavřít</ion-button>
         </ion-buttons>
-
       </ion-toolbar>
     </ion-header>
-
-
     <ion-content class="ion-padding">
-
       <ion-item>
-
-        <ion-input
-          label="Název"
-          labelPlacement="stacked"
-          [(ngModel)]="newLocation.nazev">
-        </ion-input>
-
+        <ion-input label="Název" labelPlacement="stacked" [(ngModel)]="newLocation.nazev"></ion-input>
       </ion-item>
-
-
       <ion-item>
-
-        <ion-input
-          label="Lokace"
-          labelPlacement="stacked"
-          [(ngModel)]="newLocation.lokace">
-        </ion-input>
-
+        <ion-input label="Lokace" labelPlacement="stacked" [(ngModel)]="newLocation.lokace"></ion-input>
       </ion-item>
-
-
       <ion-item>
-
-        <ion-textarea
-          label="Poznámky"
-          labelPlacement="stacked"
-          [(ngModel)]="newLocation.poznamky">
-        </ion-textarea>
-
+        <ion-textarea label="Poznámky" labelPlacement="stacked" [(ngModel)]="newLocation.poznamky"></ion-textarea>
       </ion-item>
-
-
-      <ion-button expand="block" (click)="save()">
-
-        Uložit
-
-      </ion-button>
-
+      <ion-button expand="block" (click)="save()">Uložit</ion-button>
     </ion-content>
-
   </ng-template>
+</ion-modal>
 
+<!-- MODAL: Zahájit práci -->
+<ion-modal [isOpen]="isWorkModalOpen" (didDismiss)="closeWorkModal()" [breakpoints]="[0, 0.5]" [initialBreakpoint]="0.5">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Zahájit práci</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeWorkModal()">Zavřít</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-input
+          label="Název práce"
+          labelPlacement="stacked"
+          placeholder="např. Jarní prohlídka"
+          [(ngModel)]="newWork.nazev">
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          type="date"
+          label="Datum"
+          labelPlacement="stacked"
+          [(ngModel)]="newWork.datum">
+        </ion-input>
+      </ion-item>
+      <ion-button expand="block" color="success" (click)="startWork()">
+        <ion-icon slot="start" name="play-outline"></ion-icon>
+        Zahájit
+      </ion-button>
+    </ion-content>
+  </ng-template>
 </ion-modal>

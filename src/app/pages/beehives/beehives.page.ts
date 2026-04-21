@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ApiService } from '../../../services/api.service';
+import { WorkSessionService } from '../../../services/work-session.service';
 
 // npm install qrcode @types/qrcode
 import * as QRCode from 'qrcode';
@@ -21,6 +22,7 @@ export class BeehivesPage implements OnInit {
   locationName = '';
 
   beehives: any[] = [];
+  latestSession: any = null;
 
   isModalOpen = false;
 
@@ -39,7 +41,8 @@ export class BeehivesPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    public workSession: WorkSessionService
   ) {}
 
   ngOnInit() {
@@ -57,6 +60,32 @@ export class BeehivesPage implements OnInit {
     const found = locations.find((l: any) => l.id == this.locationId);
     this.locationName = found?.nazev || 'Úly';
     this.beehives = found?.beehives || [];
+
+    // Načti aktivní nebo poslední ukončenou práci
+    if (this.workSession.isActive(this.locationId)) {
+      this.latestSession = this.workSession.getActiveSession(this.locationId);
+    } else {
+      this.latestSession = await this.api.getLatestSession(this.locationId);
+    }
+  }
+
+  // Vrátí badge jen pokud má konkrétní úl alespoň jeden záznam z poslední/aktivní práce
+  getHiveSessionBadge(hive: any): { label: string; color: string } | null {
+    if (!this.latestSession) return null;
+
+    const hasRecord = (hive.records || []).some(
+      (r: any) => r.work_session?.id === this.latestSession.id
+    );
+
+    if (!hasRecord) return null;
+
+    const isActive = this.workSession.isActive(this.locationId);
+    const datum = new Date(this.latestSession.datum).toLocaleDateString('cs-CZ');
+
+    return {
+      label: this.latestSession.nazev + ' · ' + datum,
+      color: isActive ? 'success' : 'medium'
+    };
   }
 
   openRecords(hive: any) {
@@ -77,7 +106,8 @@ export class BeehivesPage implements OnInit {
       id: res.id,
       cislo: res.cislo || this.newBeehive.cislo,
       nazev: res.nazev || this.newBeehive.nazev,
-      poznamky: res.poznamky || this.newBeehive.poznamky
+      poznamky: res.poznamky || this.newBeehive.poznamky,
+      records: []
     };
     this.beehives = [hive, ...this.beehives];
     this.newBeehive = { cislo: '', nazev: '', poznamky: '', location_id: this.locationId };
@@ -109,6 +139,7 @@ export class BeehivesPage implements OnInit {
       }
     });
   }
+
   closeQrModal() {
     this.isQrModalOpen = false;
     this.qrHive = null;

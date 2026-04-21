@@ -70,6 +70,16 @@ export class ApiService {
     );
   }
 
+  async getLatestSession(locationId: number): Promise<any | null> {
+    try {
+      return await firstValueFrom(
+        this.http.get<any>(`${this.api}/locations/${locationId}/work-sessions/latest`)
+      );
+    } catch {
+      return null;
+    }
+  }
+
   async deleteBeehive(id: number) {
     return await firstValueFrom(
       this.http.delete(`${this.api}/beehives/${id}`)
@@ -81,6 +91,12 @@ export class ApiService {
   async addRecord(data: any) {
     return await firstValueFrom(
       this.http.post(`${this.api}/beehives/${data.beehive_id}/records`, data)
+    );
+  }
+
+  async getRecords(beehiveId: number): Promise<any[]> {
+    return firstValueFrom(
+      this.http.get<any[]>(`${this.api}/beehives/${beehiveId}/records`)
     );
   }
 

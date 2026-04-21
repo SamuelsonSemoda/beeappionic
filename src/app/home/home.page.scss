@@ -1,33 +1,39 @@
-.dashboard ion-card {
-
-  text-align:center;
-  border-radius:14px;
-
+.work-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+  padding: 6px 10px;
+  background: rgba(45, 213, 91, 0.12);
+  border-radius: 8px;
+  border: 1px solid rgba(45, 213, 91, 0.3);
 }
 
-.stat-number {
-
-  font-size:1.8rem;
-  font-weight:700;
-
+.work-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2dd55b;
+  box-shadow: 0 0 6px #2dd55b;
+  flex-shrink: 0;
+  animation: pulse 1.5s infinite;
 }
 
-.stat-label {
-
-  font-size:0.9rem;
-  color:#666;
-
+.work-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+  flex: 1;
 }
 
-.location-card {
-
-  border-radius:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
 }
 
-.delete-btn {
-
-  float:right;
-
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
