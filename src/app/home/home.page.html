@@ -59,19 +59,22 @@
         <!-- Indikátor aktivní práce -->
         @if(workSession.isActive(loc.id)){
           <div class="work-indicator">
-            <div class="work-dot"></div>
-            <span class="work-label">
+            <div style="display:flex;flex-direction:row;align-items: center;justify-content: flex-start;gap:20px;font-size:18px;color:var(--ion-color-dark);background:var(--ion-color-primary);border-radius: 20px;margin-top:20px;margin-bottom:20px;">
+              <div class="work-dot"></div>
+              <span class="work-label" style="display:flex;flex-direction:row;align-items:center;gap:5px;">
+                <ion-icon name="construct-outline"></ion-icon>
               {{ workSession.getActiveSession(loc.id)?.nazev }}
-              · {{ getElapsed(loc.id) }}
-            </span>
-            <ion-button
-              fill="solid"
-              color="danger"
-              size="default"
-              (click)="stopWork(loc.id, $event)">
-              <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
-              Stop
-            </ion-button>
+                · {{ getElapsed(loc.id) }}
+              </span>
+              <ion-button
+                fill="clear"
+                color="danger"
+                size="default"
+                (click)="stopWork(loc.id, $event)">
+                <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+                Stop
+              </ion-button>
+            </div>
           </div>
         }
 
