@@ -39,7 +39,7 @@
   <!-- Badge poslední/aktivní práce – pouze pokud má úl záznam z této práce -->
   @if(getHiveSessionBadge(hive); as badge){
   <div style="margin: 8px 0;">
-    <ion-chip [color]="badge.color">
+    <ion-chip>
       <ion-icon name="construct-outline" style="margin-right: 6px;"></ion-icon>
       {{ badge.label }}
     </ion-chip>
