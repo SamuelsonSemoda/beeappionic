@@ -92,12 +92,25 @@
       }
 
       <ion-item>
-        <ion-select label="Typ" labelPlacement="stacked" [(ngModel)]="newRecord.typ_akce">
+        <ion-select label="Typ" labelPlacement="stacked" [(ngModel)]="newRecord.typ_akce" (ngModelChange)="onTypChange($event)">
           <ion-select-option value="kontrola">Kontrola</ion-select-option>
           <ion-select-option value="krmení">Krmení</ion-select-option>
           <ion-select-option value="léčení">Léčení</ion-select-option>
+          <ion-select-option value="medník">Medník</ion-select-option>
+          <ion-select-option value="jiné">Jiné</ion-select-option>
         </ion-select>
       </ion-item>
+
+      @if(newRecord.typ_akce === 'jiné'){
+        <ion-item>
+          <ion-input
+            label="Vlastní typ"
+            labelPlacement="stacked"
+            placeholder="Napiš vlastní typ akce"
+            [(ngModel)]="newRecord.typ_akce_custom">
+          </ion-input>
+        </ion-item>
+      }
 
       <ion-item>
         <ion-input type="date" label="Datum" labelPlacement="stacked" [(ngModel)]="newRecord.datum"></ion-input>

@@ -15,60 +15,60 @@
 <ion-content class="ion-padding">
 
   @if(beehives.length === 0){
-  <ion-card>
-    <ion-card-content class="ion-text-center">
-      Žádné úly
-    </ion-card-content>
-  </ion-card>
+    <ion-card>
+      <ion-card-content class="ion-text-center">
+        Žádné úly
+      </ion-card-content>
+    </ion-card>
   }
 
   @for(hive of beehives; track hive.id){
-  <ion-card button (click)="openRecords(hive)">
+    <ion-card button (click)="openRecords(hive)">
 
-    <ion-card-header>
-      <ion-card-title>Úl č. {{ hive.cislo }}</ion-card-title>
-      <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
-    </ion-card-header>
+      <ion-card-header>
+        <ion-card-title>Úl č. {{ hive.cislo }}</ion-card-title>
+        <ion-card-subtitle>{{ hive.nazev }}</ion-card-subtitle>
+      </ion-card-header>
 
-    <ion-card-content>
+      <ion-card-content>
 
-      @if(hive.poznamky){
-  <ion-note>{{ hive.poznamky }}</ion-note>
-  }
+        @if(hive.poznamky){
+          <ion-note>{{ hive.poznamky }}</ion-note>
+        }
 
-  <!-- Badge poslední/aktivní práce – pouze pokud má úl záznam z této práce -->
-  @if(getHiveSessionBadge(hive); as badge){
-  <div style="margin: 8px 0;">
-    <ion-chip>
-      <ion-icon name="construct-outline" style="margin-right: 6px;"></ion-icon>
-      {{ badge.label }}
-    </ion-chip>
-  </div>
-  }
+        <!-- Badge poslední/aktivní práce – pouze pokud má úl záznam z této práce -->
+        @if(getHiveSessionBadge(hive); as badge){
+          <div style="margin: 8px 0;">
+            <ion-chip [color]="badge.color">
+              <ion-icon name="construct-outline"></ion-icon>
+              {{ badge.label }}
+            </ion-chip>
+          </div>
+        }
 
-  <div class="card-actions">
+        <div class="card-actions">
 
-    <ion-button
-      fill="clear"
-      size="small"
-      (click)="openQr(hive, $event)">
-      <ion-icon slot="start" name="qr-code-outline"></ion-icon>
-      QR kód
-    </ion-button>
+          <ion-button
+            fill="clear"
+            size="small"
+            (click)="openQr(hive, $event)">
+            <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+            QR kód
+          </ion-button>
 
-    <ion-button
-      fill="clear"
-      color="danger"
-      size="small"
-      (click)="delete(hive.id); $event.stopPropagation()">
-      Smazat
-    </ion-button>
+          <ion-button
+            fill="clear"
+            color="danger"
+            size="small"
+            (click)="delete(hive.id); $event.stopPropagation()">
+            Smazat
+          </ion-button>
 
-  </div>
+        </div>
 
-</ion-card-content>
+      </ion-card-content>
 
-</ion-card>
+    </ion-card>
   }
 
 </ion-content>
@@ -141,7 +141,7 @@
       <ion-toolbar>
         <ion-title>
           @if(qrHive){
-          QR — Úl č. {{ qrHive.cislo }}
+            QR — Úl č. {{ qrHive.cislo }}
           }
         </ion-title>
         <ion-buttons slot="end">
@@ -155,24 +155,24 @@
 
         @if(qrDataUrl){
 
-        <img [src]="qrDataUrl" class="qr-image" alt="QR kód úlu" />
+          <img [src]="qrDataUrl" class="qr-image" alt="QR kód úlu" />
 
-        <p class="qr-label">
-          @if(qrHive?.nazev){
-        {{ qrHive.nazev }} —
-        }
-        Úl č. {{ qrHive?.cislo }}
-        </p>
+          <p class="qr-label">
+            @if(qrHive?.nazev){
+              {{ qrHive.nazev }} —
+            }
+            Úl č. {{ qrHive?.cislo }}
+          </p>
 
-        <ion-button expand="block" (click)="downloadQr()">
-          <ion-icon slot="start" name="download-outline"></ion-icon>
-          Stáhnout PNG
-        </ion-button>
+          <ion-button expand="block" (click)="downloadQr()">
+            <ion-icon slot="start" name="download-outline"></ion-icon>
+            Stáhnout PNG
+          </ion-button>
 
         } @else {
-        <div class="qr-loading">
-          <ion-spinner name="crescent"></ion-spinner>
-        </div>
+          <div class="qr-loading">
+            <ion-spinner name="crescent"></ion-spinner>
+          </div>
         }
 
       </div>

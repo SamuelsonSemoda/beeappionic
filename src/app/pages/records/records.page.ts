@@ -23,6 +23,7 @@ export class RecordsPage implements OnInit {
 
   newRecord: any = {
     typ_akce: 'kontrola',
+    typ_akce_custom: '',
     datum: '',
     popis: '',
     beehive_id: null
@@ -60,6 +61,12 @@ export class RecordsPage implements OnInit {
     this.records = await this.api.getRecords(this.beehiveId);
   }
 
+  onTypChange(val: string) {
+    if (val !== 'jiné') {
+      this.newRecord.typ_akce_custom = '';
+    }
+  }
+
   openModal() {
     this.isModalOpen = true;
   }
@@ -70,7 +77,14 @@ export class RecordsPage implements OnInit {
 
   async save() {
     try {
-      const res: any = await this.api.addRecord(this.newRecord);
+      const payload = {
+        ...this.newRecord,
+        typ_akce: this.newRecord.typ_akce === 'jiné'
+          ? this.newRecord.typ_akce_custom || 'jiné'
+          : this.newRecord.typ_akce
+      };
+
+      const res: any = await this.api.addRecord(payload);
 
       const record = {
         id: res.id,
@@ -84,6 +98,7 @@ export class RecordsPage implements OnInit {
 
       this.newRecord = {
         typ_akce: 'kontrola',
+        typ_akce_custom: '',
         datum: '',
         popis: '',
         beehive_id: this.beehiveId

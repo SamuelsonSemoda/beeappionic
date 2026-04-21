@@ -7,6 +7,10 @@
   background: rgba(45, 213, 91, 0.12);
   border-radius: 8px;
   border: 1px solid rgba(45, 213, 91, 0.3);
+
+  ion-button {
+    flex-shrink: 0;
+  }
 }
 
 .work-dot {
