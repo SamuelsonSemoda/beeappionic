@@ -129,7 +129,7 @@ export class BeehivesPage implements OnInit {
     this.qrDataUrl = '';
     this.isQrModalOpen = true;
 
-    const url = `${environment.appUrl}/records/${hive.id}`;
+    const url = `${environment.appUrl}/records/${hive.id}?location=${this.locationId}`;
 
     this.qrDataUrl = await QRCode.toDataURL(url, {
       width: 400,

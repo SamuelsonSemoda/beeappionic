@@ -51,7 +51,7 @@
           <ion-button
             fill="clear"
             size="small"
-            (click)="openQr(hive, $event)">
+            (click)="$event.stopPropagation(); openQr(hive, $event)">
             <ion-icon slot="start" name="qr-code-outline"></ion-icon>
             QR kód
           </ion-button>

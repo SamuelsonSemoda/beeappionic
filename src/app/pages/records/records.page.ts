@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
-
 import { ApiService } from '../../../services/api.service';
 import { WorkSessionService } from '../../../services/work-session.service';
 
@@ -20,6 +19,7 @@ export class RecordsPage implements OnInit {
   beehiveName = '';
   records: any[] = [];
   isModalOpen = false;
+  backHref = '/';
 
   newRecord: any = {
     typ_akce: 'kontrola',
@@ -38,6 +38,14 @@ export class RecordsPage implements OnInit {
   ngOnInit() {
     this.beehiveId = Number(this.route.snapshot.paramMap.get('id'));
     this.newRecord.beehive_id = this.beehiveId;
+
+    // Pokud přišel z QR kódu, má location v query parametru
+    const locationParam = this.route.snapshot.queryParamMap.get('location');
+    if (locationParam) {
+      this.locationId = Number(locationParam);
+      this.backHref = `/beehives/${this.locationId}`;
+    }
+
     this.load();
   }
 
@@ -52,12 +60,14 @@ export class RecordsPage implements OnInit {
       const hive = loc.beehives?.find((b: any) => b.id == this.beehiveId);
       if (hive) {
         this.beehiveName = `Úl ${hive.cislo}`;
-        this.locationId = loc.id;
+        if (!this.locationId) {
+          this.locationId = loc.id;
+          this.backHref = `/beehives/${loc.id}`;
+        }
         break;
       }
     }
 
-    // Načti záznamy přímo z API – vrátí i work_session objekt
     this.records = await this.api.getRecords(this.beehiveId);
   }
 

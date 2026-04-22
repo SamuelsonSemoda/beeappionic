@@ -34,11 +34,15 @@ const routes: Routes = [
       import('./pages/records/records.page').then(m => m.RecordsPage)
   }
 
+
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+      paramsInheritanceStrategy: 'always'
+    })
   ],
   exports: [RouterModule]
 })

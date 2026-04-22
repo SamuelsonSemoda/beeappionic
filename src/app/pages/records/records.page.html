@@ -1,9 +1,12 @@
 <ion-header>
   <ion-toolbar color="primary">
+
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/" text="Úly"></ion-back-button>
+      <ion-back-button [defaultHref]="backHref" text="Úly"></ion-back-button>
     </ion-buttons>
+
     <ion-title>{{ beehiveName }}</ion-title>
+
   </ion-toolbar>
 </ion-header>
 
@@ -40,7 +43,6 @@
           <p>{{ record.popis }}</p>
         }
 
-        <!-- Badge práce u záznamu -->
         @if(record.work_session){
           <ion-chip color="success" class="work-chip">
             <ion-icon name="construct-outline" style="margin-right: 6px;"></ion-icon>
@@ -80,7 +82,6 @@
     </ion-header>
     <ion-content class="ion-padding">
 
-      <!-- Info o aktivní práci -->
       @if(locationId && workSession.isActive(locationId)){
         <ion-item color="success" lines="none" class="work-info">
           <ion-icon name="construct-outline" slot="start"></ion-icon>

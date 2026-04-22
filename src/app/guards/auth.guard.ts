@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../environments/environment';
 
@@ -13,9 +13,8 @@ export class AuthGuard implements CanActivate {
     private router: Router
   ) {}
 
-  async canActivate(): Promise<boolean> {
-
-    // Auth je vypnuté — pustíme dál bez kontroly
+  async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
+  // Auth je vypnuté — pustíme dál bez kontroly
     if (!environment.authEnabled) return true;
 
     const loggedIn = await this.auth.isLoggedIn();
