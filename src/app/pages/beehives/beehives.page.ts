@@ -9,6 +9,7 @@ import { WorkSessionService } from '../../../services/work-session.service';
 
 // npm install qrcode @types/qrcode
 import * as QRCode from 'qrcode';
+import {HoneycombComponent} from "../../components/honeycomb.component";
 
 @Component({
   standalone: true,
